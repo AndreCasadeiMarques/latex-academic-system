@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>LaTeX Acadêmico Studio | Tablet & Mobile</title>
+  
+  <meta name="description" content="Sistema de escrita acadêmica colaborativa em LaTeX para Tablet, Celular e PC integrado ao GitHub e Obsidian.">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header Bar -->
+  <header class="top-nav">
+    <div class="nav-left">
+      <button id="toggle-sidebar-btn" class="icon-btn" title="Arquivos e Seções">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <div class="brand">
+        <span class="brand-badge">LaTeX Studio</span>
+        <span id="active-repo-name" class="repo-badge">demo / paper-cros2027</span>
+      </div>
+    </div>
+
+    <!-- Center Mode Switcher (Mobile/Tablet) -->
+    <div class="view-switcher" id="view-switcher">
+      <button class="view-btn active" data-view="editor">Editor</button>
+      <button class="view-btn" data-view="preview">PDF Preview</button>
+      <button class="view-btn" data-view="fichamentos">Fichamentos</button>
+    </div>
+
+    <!-- Top Action Buttons -->
+    <div class="nav-right">
+      <div class="actions-status" id="actions-status" title="Status da Compilação no GitHub Actions">
+        <span class="status-dot ready"></span>
+        <span class="status-text">Actions: Pronto</span>
+      </div>
+      <button id="quick-save-btn" class="btn btn-secondary" title="Salvar Localmente (Ctrl+S)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <span>Salvar</span>
+      </button>
+      <button id="commit-modal-btn" class="btn btn-primary" title="Enviar para o GitHub">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><line x1="1.05" y1="12" x2="7" y2="12"/><line x1="17.01" y1="12" x2="22.96" y2="12"/></svg>
+        <span>Commit Git</span>
+      </button>
+      <button id="open-settings-btn" class="icon-btn" title="Configurações">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Workspace Layout -->
+  <main class="app-layout">
+    <!-- Sidebar: File Explorer & Modular Sections -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h3>Seções do Artigo</h3>
+        <button id="new-section-btn" class="icon-btn-small" title="Nova Seção">+</button>
+      </div>
+      <div class="file-tree" id="file-tree">
+        <!-- Rendered dynamically via app.js -->
+      </div>
+      
+      <div class="sidebar-templates">
+        <span class="sub-heading">Templates Prontos</span>
+        <div class="template-chips">
+          <span class="chip active">IEEEtran Conf</span>
+          <span class="chip">SBC / Eventos</span>
+          <span class="chip">Elsevier</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Center Pane: Editor Workspace -->
+    <section class="editor-pane" id="editor-pane">
+      <!-- Editor Header & Tab -->
+      <div class="editor-header">
+        <div class="file-info">
+          <span class="file-icon">📄</span>
+          <span id="current-filename" class="file-name">sections/01_introduction.tex</span>
+          <span id="unsaved-tag" class="unsaved-tag hidden">não salvo</span>
+        </div>
+        <div class="editor-stats">
+          <span id="word-count">0 palavras</span>
+          <span id="char-count">0 caracteres</span>
+        </div>
+      </div>
+
+      <!-- Touch Toolbar (Ergonomic for Galaxy Tab S10 FE & Mobile) -->
+      <div class="touch-toolbar">
+        <div class="toolbar-scroll">
+          <button class="tool-btn" data-action="undo" title="Desfazer">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+          </button>
+          <button class="tool-btn" data-action="redo" title="Refazer">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"/></svg>
+          </button>
+          <span class="tool-divider"></span>
+          <button class="tool-btn highlight" id="cite-picker-trigger" title="Buscar e Inserir Citação">\cite{}</button>
+          <button class="tool-btn" data-action="ref" title="Referência Cruzada">\ref{}</button>
+          <button class="tool-btn" data-action="equation" title="Ambiente de Equação">\begin{eq}</button>
+          <button class="tool-btn" data-action="figure" title="Ambiente de Figura">\begin{fig}</button>
+          <button class="tool-btn" data-action="table" title="Ambiente de Tabela">\begin{tab}</button>
+          <button class="tool-btn" data-action="itemize" title="Lista de Itens">\begin{item}</button>
+          <span class="tool-divider"></span>
+          <button class="tool-btn" data-action="math" title="Math Inline">$ ... $</button>
+          <button class="tool-btn" data-action="bold" title="Negrito">\textbf</button>
+          <button class="tool-btn" data-action="italic" title="Itálico">\textit</button>
+        </div>
+      </div>
+
+      <!-- Code Textarea -->
+      <div class="editor-container">
+        <textarea id="latex-code" spellcheck="false" placeholder="Escreva seu código LaTeX aqui..."></textarea>
+      </div>
+    </section>
+
+    <!-- Right Pane: Multi-Tab Viewer (Preview, Fichamentos, Colaboradores) -->
+    <aside class="aux-pane" id="aux-pane">
+      <div class="aux-tabs">
+        <button class="aux-tab active" data-tab="preview">PDF Preview</button>
+        <button class="aux-tab" data-tab="fichamentos">
+          <span>Fichamentos</span>
+          <span class="counter-badge" id="kb-count">3</span>
+        </button>
+        <button class="aux-tab" data-tab="git">Colaboradores</button>
+      </div>
+
+      <!-- Tab Content 1: PDF & Compilation -->
+      <div class="tab-content active" id="tab-preview">
+        <div class="preview-actions">
+          <button id="refresh-preview-btn" class="btn btn-sm btn-secondary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Preview Rápido
+          </button>
+          <a id="download-pdf-btn" href="#" class="btn btn-sm btn-primary" target="_blank" download="main.pdf">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Baixar PDF Oficial
+          </a>
+          <button id="push-drive-review-btn" class="btn btn-sm btn-outline" title="Enviar PDF ao Drive para riscar no Xodo com S-Pen">
+            ✏️ Revisão S-Pen
+          </button>
+        </div>
+
+        <div class="preview-viewport" id="preview-viewport">
+          <div class="preview-card" id="preview-render-area">
+            <!-- Simulated / Rendered Preview -->
+            <div class="rendered-paper">
+              <h2 id="prev-title">Carregando visualização...</h2>
+              <div id="prev-body" class="paper-text"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Content 2: Fichamentos da Biblioteca_Academica (Obsidian / Docling) -->
+      <div class="tab-content" id="tab-fichamentos">
+        <div class="kb-header">
+          <input type="text" id="kb-search" placeholder="🔍 Buscar autor, grifo ou equação..." class="search-input">
+        </div>
+        <div class="kb-list" id="kb-list">
+          <!-- Rendered via app.js -->
+        </div>
+      </div>
+
+      <!-- Tab Content 3: Git & Lab Colleagues -->
+      <div class="tab-content" id="tab-git">
+        <div class="git-panel">
+          <h4>Coautores do Artigo</h4>
+          <ul class="author-list" id="author-list">
+            <li>
+              <div class="author-avatar">AM</div>
+              <div class="author-details">
+                <strong>André Casadei Marques</strong>
+                <span class="role">Autor Principal</span>
+              </div>
+            </li>
+            <li>
+              <div class="author-avatar">LAB</div>
+              <div class="author-details">
+                <strong>Colega do LAB</strong>
+                <span class="role">Coautor (Edição Modular)</span>
+              </div>
+            </li>
+          </ul>
+
+          <div class="git-history">
+            <h4>Últimos Commits no GitHub</h4>
+            <div class="commit-log" id="commit-log">
+              <!-- Rendered via app.js -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Modal: Citation Picker (\cite{}) -->
+  <div class="modal-overlay hidden" id="cite-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Inserir Citação (\cite{})</h3>
+        <button class="close-modal-btn" id="close-cite-modal">&times;</button>
+      </div>
+      <div class="modal-search">
+        <input type="text" id="cite-search" placeholder="Filtrar por autor, título ou ano..." autofocus>
+      </div>
+      <div class="cite-list" id="cite-list">
+        <!-- Rendered dynamically from references.bib -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Git Commit Dialog -->
+  <div class="modal-overlay hidden" id="commit-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Sincronizar com GitHub</h3>
+        <button class="close-modal-btn" id="close-commit-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <label for="commit-msg">Mensagem do Commit:</label>
+        <textarea id="commit-msg" rows="3" placeholder="Ex: Adiciona formulação da seção de metodologia"></textarea>
+        
+        <div class="commit-summary">
+          <span class="summary-label">Arquivo:</span>
+          <span id="commit-target-file">sections/01_introduction.tex</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="cancel-commit-btn">Cancelar</button>
+        <button class="btn btn-primary" id="confirm-commit-btn">Fazer Commit & Push</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Settings Dialog -->
+  <div class="modal-overlay hidden" id="settings-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Configurações do Sistema</h3>
+        <button class="close-modal-btn" id="close-settings-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="cfg-repo">Repositório GitHub (owner/repo):</label>
+          <input type="text" id="cfg-repo" value="AndreCasadeiMarques/paper-cros2027">
+        </div>
+        <div class="form-group">
+          <label for="cfg-token">GitHub Personal Access Token (PAT):</label>
+          <input type="password" id="cfg-token" placeholder="ghp_xxxxxxxxxxxxxxxxx">
+          <small>Usado apenas localmente para sincronização direta com seu GitHub.</small>
+        </div>
+        <div class="form-group">
+          <label for="cfg-drive">Pasta de Revisão S-Pen (Google Drive):</label>
+          <input type="text" id="cfg-drive" value="G:\Meu Drive\Obsidian_Pesquisa\Biblioteca_Academica\Revisoes_PDF">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="save-settings-btn">Salvar Configurações</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
