@@ -1,0 +1,65 @@
+name: Build and Release LaTeX PDF
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - '**.tex'
+      - '**.bib'
+      - '**.cls'
+      - '**.sty'
+      - 'figures/**'
+      - '.github/workflows/compile-latex.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build_latex:
+    name: Compile LaTeX Document
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compile LaTeX document
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: main.tex
+          args: -pdf -shell-escape -interaction=nonstopmode -file-line-error -synctex=1
+          continue_on_error: false
+
+      - name: Check generated PDF
+        run: |
+          if [ ! -f main.pdf ]; then
+            echo "::error::PDF was not generated!"
+            exit 1
+          fi
+          echo "PDF generated successfully: $(ls -lh main.pdf)"
+
+      - name: Upload PDF Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: compiled-paper
+          path: main.pdf
+          retention-days: 30
+
+      - name: Update 'latest' GitHub Release with compiled PDF
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        with:
+          tag_name: latest
+          name: "Latest Compiled Paper (Auto-Build)"
+          body: |
+            Automatic build triggered by commit `${{ github.sha }}`.
+            Author: `${{ github.actor }}`
+            
+            Download the latest compiled paper directly: [main.pdf](https://github.com/${{ github.repository }}/releases/download/latest/main.pdf)
+          files: main.pdf
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
