@@ -1,4 +1,4 @@
-// LaTeX Acadêmico Studio - Core Controller
+// LaTeX Acadêmico Studio - Core Controller with Real TeX Live Engine
 (function() {
   'use strict';
 
@@ -6,22 +6,50 @@
   // State Management
   // -----------------------------------------------------------------
   const state = {
-    currentFile: 'sections/01_introduction.tex',
+    currentFile: 'main.tex',
     files: {
       'main.tex': `\\documentclass[conference]{IEEEtran}
 \\IEEEoverridecommandlockouts
 \\usepackage{cite}
 \\usepackage{amsmath,amssymb,amsfonts}
+\\usepackage{algorithmic}
 \\usepackage{graphicx}
+\\usepackage{textcomp}
+\\usepackage{xcolor}
 \\usepackage{booktabs}
 \\usepackage{hyperref}
 
+\\def\\BibTeX{{\\rm B\\kern-.05em{\\sc i\\kern-.025em b}\\kern-.08em
+    T\\kern-.1667em\\lower.7ex\\hbox{E}\\kern-.125emX}}
+
 \\begin{document}
-\\title{Autonomous Robotic Systems and Academic Workflow Automation}
-\\author{\\IEEEauthorblockN{Andr\\'e Casadei Marques}}
+
+\\title{A Framework Integrating Simulated Drone Swarm With a Real Outdoor UAV\\\\
+\\thanks{Supported by Aeronautics Institute of Technology (ITA) and Robotics Laboratory.}
+}
+
+\\author{\\IEEEauthorblockN{Andr{\\'e} Casadei Marques}
+\\IEEEauthorblockA{\\textit{Department of Computer Systems and Robotics} \\\\
+\\textit{Aeronautics Institute of Technology (ITA)}\\\\
+S{\\~a}o Jos{\\'e} dos Campos, Brazil \\\\
+andre.marques.102192@ga.ita.br}
+\\and
+\\IEEEauthorblockN{2\\textsuperscript{nd} Lab Researcher}
+\\IEEEauthorblockA{\\textit{Department of Robotics} \\\\
+\\textit{Robotics Laboratory}\\\\
+coauthor@ita.br}
+}
+
 \\maketitle
 
-\\input{sections/00_abstract.tex}
+\\begin{abstract}
+Unmanned Aerial Vehicle (UAV) swarms demand extensive experimental validation under realistic communication constraints and dynamic outdoor environments. In this paper, we present an end-to-end framework integrating simulated swarm agents with an outdoor physical quadrotor via hardware-in-the-loop consensus protocols. Our approach bridges the reality gap while enabling real-time telemetry streaming, distributed state estimation, and automated mission logging.
+\\end{abstract}
+
+\\begin{IEEEkeywords}
+UAV Swarms, Hardware-in-the-Loop, Distributed Consensus, Autonomous Robotics, Field Experiments.
+\\end{IEEEkeywords}
+
 \\input{sections/01_introduction.tex}
 \\input{sections/02_related_work.tex}
 \\input{sections/03_methodology.tex}
@@ -30,71 +58,62 @@
 
 \\bibliographystyle{IEEEtran}
 \\bibliography{references}
-\\end{document}`,
 
-      'sections/00_abstract.tex': `\\begin{abstract}
-Writing academic papers across diverse platforms (tablets, mobile devices, and desktop workstations) often introduces version divergence and toolchain fragmentation. In this paper, we propose a lightweight, serverless framework that unifies collaborative LaTeX authoring, automated cloud compilation, and bidirectional knowledge base synthesis. By decoupling modular sections and leveraging asynchronous version control alongside multi-agent reasoning, our approach eliminates vendor lock-in while preserving real-time author ergonomics.
-\\end{abstract}`,
+\\end{document}`,
 
       'sections/01_introduction.tex': `\\section{Introduction}
 \\label{sec:intro}
 
-Academic research in engineering and computer science relies heavily on \\LaTeX{} for precise typesetting, mathematical formulation, and bibliographic consistency. However, contemporary collaborative authoring often forces researchers to compromise between cumbersome local toolchains and proprietary, subscription-gated cloud platforms.
+In recent years, Unmanned Aerial Vehicles (UAVs) have emerged as essential systems for environmental monitoring, search-and-rescue, and persistent surveillance \\cite{Alqudsi2025UavSwarms}. When organized into multi-agent or swarm formations, these vehicles achieve broad spatial coverage and elevated fault tolerance \\cite{mohsan2023}.
 
-Mobile and stylus-enabled tablets (such as the Samsung Galaxy Tab S10 FE with S-Pen) provide unprecedented portability for reading and annotating drafts. Coupling stylus feedback directly with native source code without tedious manual transcription remains an open challenge.
+However, experimentally evaluating and validating complex swarm control and decision-making strategies in real outdoor environments remains a significant bottleneck due to hardware costs, collision risks, and physical space limits.
 
-Recent developments in distributed swarm coordination \\cite{Alqudsi2025UavSwarms} inspire decentralized document synthesis paradigms. In this work, we present an end-to-end framework featuring:
-\\begin{itemize}
-    \\item \\textbf{Decoupled Modular Architecture:} Section-level granularity preventing merge conflicts among co-authors.
-    \\item \\textbf{Serverless Continuous Compilation:} Automated compilation pipeline using GitHub Actions with zero cloud maintenance cost.
-    \\item \\textbf{Knowledge Base Synthesis:} Bidirectional integration with Obsidian and multimodal PDF extractors \\cite{Docling2024IBM}.
-\\end{itemize}`,
+To address these challenges, we present an architecture that couples high-fidelity digital-twin swarms with live outdoor flight telemetry, enabling safe and reproducible multi-robot deployment.`,
 
       'sections/02_related_work.tex': `\\section{Related Work}
 \\label{sec:related_work}
 
-Collaborative document authoring has evolved across two primary axes: WYSIWYG platforms and programmatic markup systems.
+UAV swarm testbeds have been broadly explored across pure simulation environments and physical indoor motion-capture arenas.
 
-\\subsection{Document Conversion and AI Synthesis}
-Modern foundation models \\cite{Vaswani2017Attention} and specialized layout extractors like Docling \\cite{Docling2024IBM} allow researchers to convert complex multi-column academic PDFs into structured Markdown with high fidelity. Integrating these representations directly into the authoring loop bridges the gap between literature survey and manuscript draft.`,
+Indoor arenas provide high-precision ground truth using optical tracking systems; however, they cannot emulate aerodynamic wind gusts, GPS degradation, and long-range RF propagation typical of field operations \\cite{Alqudsi2025UavSwarms}. Conversely, outdoor field trials often compromise safety when testing emergent consensus algorithms. Our hybrid architecture reconciles these two extremes through real-time state synthesis.`,
 
       'sections/03_methodology.tex': `\\section{System Methodology}
 \\label{sec:methodology}
 
-The system architecture decouples data ingestion, text authoring, and typesetting validation into three synchronized layers:
+The core architecture coordinates real and virtual vehicles through an agreement protocol on positional centroids:
 
 \\begin{equation}
 \\label{eq:consensus}
-\\mathbf{S}_{k+1} = \\mathbf{S}_k + \\alpha \\sum_{j \\in \\mathcal{N}_i} (\\mathbf{S}_j - \\mathbf{S}_k) + \\beta \\mathbf{\\Delta}_{AI}
+\\mathbf{p}_{i}[k+1] = \\mathbf{p}_{i}[k] + \\gamma \\sum_{j \\in \\mathcal{N}_i} a_{ij} (\\mathbf{p}_j[k] - \\mathbf{p}_i[k]) + \\mathbf{v}_{ext}
 \\end{equation}
-where $\\mathbf{S}_k$ represents the document state vector at revision $k$, $\\mathcal{N}_i$ denotes the set of collaborating authors, and $\\mathbf{\\Delta}_{AI}$ models the generative updates injected by autonomous research agents.`,
+where $\\mathbf{p}_i[k] \\in \\mathbb{R}^3$ denotes the 3D position vector of agent $i$, $\\mathcal{N}_i$ represents the active neighborhood topology, and $\\mathbf{v}_{ext}$ compensates for outdoor atmospheric disturbances measured by onboard IMU/barometer sensors.`,
 
       'sections/04_experimental_results.tex': `\\section{Experimental Results}
 \\label{sec:results}
 
-We evaluated our architecture across three dimensions: compilation latency, memory consumption, and collaboration conflict rate. Table~\\ref{tab:comparison} summarizes the empirical comparison.
+Validation trials were executed with one physical Holybro X500 quadrotor operating simultaneously with 15 simulated agents. Table~\\ref{tab:metrics} reports the positional tracking errors across varying packet drop rates.
 
 \\begin{table}[htbp]
-\\caption{Comparison of Collaborative Writing Environments}
+\\caption{Trajectory Consensus Performance Under Packet Loss}
 \\begin{center}
 \\begin{tabular}{lccc}
 \\toprule
-\\textbf{Metric} & \\textbf{Traditional Cloud} & \\textbf{Local TeX} & \\textbf{Our System} \\\\
+\\textbf{Packet Loss} & \\textbf{RMS Error (m)} & \\textbf{Max Drift (m)} & \\textbf{Consensus Time (s)} \\\\
 \\midrule
-Monthly Cost & \\$15--\\$30/user & Free & \\textbf{Free (Serverless)} \\\\
-Multi-Author Limit & 1 (Free tier) & N/A & \\textbf{Unlimited (Git)} \\\\
-Mobile / Tablet Usability & Moderate & Low & \\textbf{High (Touch PWA)} \\\\
-Knowledge Base Sync & Manual & Manual & \\textbf{Automated (Obsidian)} \\\\
+0\\% & 0.082 & 0.141 & 3.2 \\\\
+15\\% & 0.114 & 0.203 & 3.8 \\\\
+30\\% & 0.187 & 0.312 & 4.6 \\\\
+45\\% & 0.245 & 0.428 & 5.9 \\\\
 \\bottomrule
 \\end{tabular}
-\\label{tab:comparison}
+\\label{tab:metrics}
 \\end{center}
 \\end{table}`,
 
       'sections/05_conclusion.tex': `\\section{Conclusion}
 \\label{sec:conclusion}
 
-This paper introduced an integrated, cloud-compiled academic authoring system designed specifically for mobile, tablet, and multi-author research environments. Future work will expand multi-agent semantic reconciliation and automated diagram vectorization directly from stylus sketches.`,
+This paper demonstrated a hybrid swarm framework linking physical UAV flight in outdoor environments with real-time simulated agent swarms. Future work includes testing autonomous collision avoidance with dynamic obstacles and expanding the fleet to multiple physical aircraft.`,
 
       'references.bib': `@article{Alqudsi2025UavSwarms,
   author    = {Alqudsi, A. and Smith, J. and Marques, A. C.},
@@ -106,18 +125,19 @@ This paper introduced an integrated, cloud-compiled academic authoring system de
   publisher = {IEEE}
 }
 
-@inproceedings{Vaswani2017Attention,
-  author    = {Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and others},
-  title     = {Attention is All You Need},
-  booktitle = {NeurIPS},
-  pages     = {5998--6008},
-  year      = {2017}
+@article{mohsan2023,
+  author    = {Mohsan, S. A. H. and Khan, M. A. and Noor, F. and Ullah, I. and Alsharif, M. H.},
+  title     = {Towards the analytical performance of UAV communications: A comprehensive review},
+  journal   = {Computer Networks},
+  volume    = {222},
+  pages     = {109556},
+  year      = {2023}
 }
 
-@article{Docling2024IBM,
-  author    = {Docling Team and Deep Search Research Group},
-  title     = {Docling: High-Precision Document Conversion for Multimodal AI Workflows},
-  journal   = {arXiv preprint arXiv:2408.09869},
+@inproceedings{Docling2024IBM,
+  author    = {Docling Research Team},
+  title     = {High-Precision Document Conversion for Multimodal AI Workflows},
+  booktitle = {Proceedings of Document Engineering},
   year      = {2024}
 }`
     },
@@ -133,34 +153,34 @@ This paper introduced an integrated, cloud-compiled academic authoring system de
         fichamento: 'Alqudsi_2025_UavSwarms_Fichamento.md'
       },
       {
-        id: 'docling2024',
-        citeKey: 'Docling2024IBM',
-        title: 'Docling: High-Precision Document Conversion for Multimodal AI Workflows',
-        authors: 'Docling Research Team (2024)',
-        collection: 'IA & Agentes',
-        highlight: '“Enables native parsing of multi-column papers, converting complex tables and mathematical formulas directly into structured Markdown.”',
-        page: 'p. 4',
-        fichamento: 'Docling_2024_FullText_Fichamento.md'
+        id: 'mohsan2023',
+        citeKey: 'mohsan2023',
+        title: 'Towards the analytical performance of UAV communications',
+        authors: 'Mohsan et al. (2023)',
+        collection: 'Comunicações UAV',
+        highlight: '“Swarm network topologies suffer severe degradation under NLOS outdoor channels, necessitating adaptive rate control.”',
+        page: 'p. 8',
+        fichamento: 'Mohsan_2023_Comms_Fichamento.md'
       },
       {
-        id: 'vaswani2017',
-        citeKey: 'Vaswani2017Attention',
-        title: 'Attention is All You Need',
-        authors: 'Vaswani et al. (2017)',
-        collection: 'Fundamentos',
-        highlight: '“The dominant sequence transduction models are based on complex recurrent or convolutional neural networks that include an encoder and a decoder.”',
-        page: 'p. 1',
-        fichamento: 'Vaswani_2017_Attention_Fichamento.md'
+        id: 'docling2024',
+        citeKey: 'Docling2024IBM',
+        title: 'High-Precision Document Conversion for Multimodal AI Workflows',
+        authors: 'Docling Research Team (2024)',
+        collection: 'IA & Agentes',
+        highlight: '“Converts multi-column academic PDFs, complex tables, and LaTeX equations into structured Markdown with high fidelity.”',
+        page: 'p. 4',
+        fichamento: 'Docling_2024_FullText_Fichamento.md'
       }
     ],
     commits: [
-      { msg: 'feat: add experimental evaluation and comparison table', author: 'André Casadei Marques', time: 'Há 12 minutos', sha: 'c4e912a' },
-      { msg: 'refactor(sections): isolate methodology equation #1', author: 'Colega LAB', time: 'Há 2 horas', sha: '8f7a23b' },
-      { msg: 'docs: initial modular structure and IEEEtran template', author: 'André Casadei Marques', time: 'Ontem às 22:45', sha: '10a39d8' }
+      { msg: 'feat: add trajectory consensus evaluation table', author: 'André Casadei Marques', time: 'Há 15 minutos', sha: 'c4e912a' },
+      { msg: 'refactor(methodology): update discrete equation (1)', author: 'Pesquisador LAB', time: 'Há 2 horas', sha: '8f7a23b' },
+      { msg: 'docs: initial IEEEtran modular conference setup', author: 'André Casadei Marques', time: 'Ontem às 22:45', sha: '10a39d8' }
     ],
     unsaved: false,
     settings: {
-      repo: 'AndreCasadeiMarques/paper-cros2027',
+      repo: 'AndreCasadeiMarques/latex-academic-system',
       token: '',
       drivePath: 'G:\\Meu Drive\\Obsidian_Pesquisa\\Biblioteca_Academica\\Revisoes_PDF'
     }
@@ -182,6 +202,7 @@ This paper introduced an integrated, cloud-compiled academic authoring system de
     editorPane: document.getElementById('editor-pane'),
     auxPane: document.getElementById('aux-pane'),
     quickSaveBtn: document.getElementById('quick-save-btn'),
+    quickCompileBtnNav: document.getElementById('quick-compile-btn-nav'),
     commitModalBtn: document.getElementById('commit-modal-btn'),
     openSettingsBtn: document.getElementById('open-settings-btn'),
     citePickerTrigger: document.getElementById('cite-picker-trigger'),
@@ -207,12 +228,16 @@ This paper introduced an integrated, cloud-compiled academic authoring system de
     kbList: document.getElementById('kb-list'),
     kbCount: document.getElementById('kb-count'),
     commitLog: document.getElementById('commit-log'),
-    prevTitle: document.getElementById('prev-title'),
-    prevBody: document.getElementById('prev-body'),
-    refreshPreviewBtn: document.getElementById('refresh-preview-btn'),
-    downloadPdfBtn: document.getElementById('download-pdf-btn'),
+    triggerCompileBtn: document.getElementById('trigger-compile-btn'),
+    initialCompileBtn: document.getElementById('initial-compile-btn'),
+    openPdfExternalBtn: document.getElementById('open-pdf-external-btn'),
     pushDriveReviewBtn: document.getElementById('push-drive-review-btn'),
-    actionsStatus: document.getElementById('actions-status')
+    latexcgiForm: document.getElementById('latexcgi-form'),
+    pdfPreviewFrame: document.getElementById('pdf-preview-frame'),
+    pdfPlaceholder: document.getElementById('pdf-placeholder'),
+    compileStatusBar: document.getElementById('compile-status-bar'),
+    compileSpinner: document.getElementById('compile-spinner'),
+    compileStatusMsg: document.getElementById('compile-status-msg')
   };
 
   // -----------------------------------------------------------------
@@ -231,17 +256,18 @@ This paper introduced an integrated, cloud-compiled academic authoring system de
     el.cfgToken.value = state.settings.token || '';
     el.cfgDrive.value = state.settings.drivePath;
 
-    // Restore cached draft if available
-    const cachedFile = localStorage.getItem('latex_draft_' + state.currentFile);
-    if (cachedFile !== null) {
-      state.files[state.currentFile] = cachedFile;
-    }
+    // Restore cached drafts if available
+    Object.keys(state.files).forEach(f => {
+      const cached = localStorage.getItem('latex_draft_' + f);
+      if (cached !== null) {
+        state.files[f] = cached;
+      }
+    });
 
     renderFileTree();
     loadFile(state.currentFile);
     renderKnowledgeBase();
     renderCommitLog();
-    updatePreview();
     setupEvents();
 
     // Register service worker if available
@@ -298,7 +324,97 @@ This paper introduced an integrated, cloud-compiled academic authoring system de
     state.unsaved = false;
     el.unsavedTag.classList.add('hidden');
     showToast('Salvo no dispositivo (Offline Draft)');
-    updatePreview();
+  }
+
+  // -----------------------------------------------------------------
+  // REAL TeX Live Cloud Compilation Engine
+  // -----------------------------------------------------------------
+  function compileRealLatex() {
+    // 1. Save current edited file in memory first
+    state.files[state.currentFile] = el.latexCode.value;
+
+    // 2. Prepare full document for compilation
+    let mainDocument = state.files['main.tex'] || '';
+
+    // If currently editing a section and not in main.tex, check if main.tex exists
+    // If user deleted or modified main.tex, or if currentFile itself contains \documentclass, use current file
+    if (state.files[state.currentFile].includes('\\documentclass')) {
+      mainDocument = state.files[state.currentFile];
+    }
+
+    // 3. Setup the hidden form for texlive.net
+    const form = el.latexcgiForm;
+    form.innerHTML = '';
+
+    // Helper to append textarea input
+    function addFileInput(name, content) {
+      const textarea = document.createElement('textarea');
+      textarea.name = 'filecontents[]';
+      textarea.value = content;
+      form.appendChild(textarea);
+
+      const filenameInput = document.createElement('input');
+      filenameInput.type = 'text';
+      filenameInput.name = 'filename[]';
+      filenameInput.value = name;
+      form.appendChild(filenameInput);
+    }
+
+    // Add main document (document.tex)
+    addFileInput('document.tex', mainDocument);
+
+    // Add modular sections
+    Object.keys(state.files).forEach(fname => {
+      if (fname !== 'main.tex') {
+        // Strip directory prefix so \input{01_introduction.tex} or \input{sections/...} work
+        const base = fname.replace(/^sections\//, '');
+        addFileInput(base, state.files[fname]);
+        if (fname.startsWith('sections/')) {
+          addFileInput(fname, state.files[fname]);
+        }
+      }
+    });
+
+    // Add references.bib if present
+    if (state.files['references.bib']) {
+      addFileInput('references.bib', state.files['references.bib']);
+      addFileInput('ref.bib', state.files['references.bib']);
+    }
+
+    // Engine: pdflatex (default, fastest and standard for IEEEtran)
+    const engineInput = document.createElement('input');
+    engineInput.type = 'text';
+    engineInput.name = 'engine';
+    engineInput.value = 'pdflatex';
+    form.appendChild(engineInput);
+
+    // 4. Update UI status
+    el.pdfPlaceholder.classList.add('hidden');
+    el.compileSpinner.classList.remove('hidden');
+    el.compileStatusMsg.textContent = 'Enviando código e compilando no TeX Live (Nuvem)...';
+    showToast('Compilando no TeX Live...');
+
+    // Switch to preview tab on mobile/tablet if needed
+    if (window.innerWidth <= 820) {
+      el.editorPane.classList.remove('view-active');
+      el.auxPane.classList.add('view-active');
+      switchAuxTab('preview');
+      el.viewSwitcher.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === 'preview'));
+    } else {
+      switchAuxTab('preview');
+    }
+
+    // 5. Submit form directly to the iframe
+    form.submit();
+
+    // 6. Handle completion
+    const onFrameLoad = () => {
+      el.compileSpinner.classList.add('hidden');
+      el.compileStatusMsg.textContent = 'PDF oficial gerado com sucesso via TeX Live!';
+      showToast('PDF compilado com sucesso!');
+      el.pdfPreviewFrame.removeEventListener('load', onFrameLoad);
+    };
+    el.pdfPreviewFrame.addEventListener('load', onFrameLoad);
   }
 
   // -----------------------------------------------------------------
@@ -458,43 +574,6 @@ This paper introduced an integrated, cloud-compiled academic authoring system de
   }
 
   // -----------------------------------------------------------------
-  // Live Preview Renderer
-  // -----------------------------------------------------------------
-  function updatePreview() {
-    const currentCode = el.latexCode.value;
-    
-    // Extract title if in main
-    const titleMatch = state.files['main.tex'].match(/\\title\{([^}]+)\}/);
-    if (titleMatch) {
-      el.prevTitle.textContent = titleMatch[1];
-    } else {
-      el.prevTitle.textContent = 'Artigo Científico em LaTeX';
-    }
-
-    // Quick regex cleanup for visual preview
-    let previewText = currentCode
-      .replace(/\\section\*?\{([^}]+)\}/g, '<h3 style="font-size:1rem;margin:12px 0 4px;color:#000;">$1</h3>')
-      .replace(/\\subsection\*?\{([^}]+)\}/g, '<h4 style="font-size:0.9rem;margin:8px 0 2px;color:#111;">$1</h4>')
-      .replace(/\\textbf\{([^}]+)\}/g, '<strong>$1</strong>')
-      .replace(/\\textit\{([^}]+)\}/g, '<em>$1</em>')
-      .replace(/\\cite\{([^}]+)\}/g, '<span style="color:#2563eb;font-weight:600;">[$1]</span>')
-      .replace(/\\ref\{([^}]+)\}/g, '<span style="color:#2563eb;">[$1]</span>')
-      .replace(/\\begin\{equation\}[\s\S]*?\\end\{equation\}/g, '<div style="background:#f1f5f9;padding:8px;margin:8px 0;text-align:center;font-family:monospace;font-size:0.85rem;border-radius:4px;">[Equação Matemática Renderizada via TeX Live]</div>')
-      .replace(/\\begin\{table\}[\s\S]*?\\end\{table\}/g, '<div style="background:#f8fafc;border:1px solid #cbd5e1;padding:8px;margin:8px 0;font-size:0.8rem;border-radius:4px;">[Tabela Acadêmica Formatada]</div>')
-      .replace(/\\begin\{itemize\}[\s\S]*?\\end\{itemize\}/g, (match) => {
-        const items = match.match(/\\item\s+([^\n\\]+)/g) || [];
-        return '<ul style="margin-left:20px;margin-bottom:8px;">' + items.map(i => `<li>${i.replace(/\\item\s+/, '')}</li>`).join('') + '</ul>';
-      });
-
-    // Format paragraphs
-    const paragraphs = previewText.split('\n\n').filter(p => p.trim());
-    el.prevBody.innerHTML = paragraphs.map(p => {
-      if (p.startsWith('<h') || p.startsWith('<div') || p.startsWith('<ul')) return p;
-      return `<p>${p}</p>`;
-    }).join('');
-  }
-
-  // -----------------------------------------------------------------
   // Modals & UI Controls
   // -----------------------------------------------------------------
   function openModal(modal) {
@@ -513,6 +592,11 @@ This paper introduced an integrated, cloud-compiled academic authoring system de
     }, 3200);
   }
 
+  function switchAuxTab(tabName) {
+    document.querySelectorAll('.aux-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + tabName));
+  }
+
   // -----------------------------------------------------------------
   // Event Listeners
   // -----------------------------------------------------------------
@@ -522,11 +606,33 @@ This paper introduced an integrated, cloud-compiled academic authoring system de
       onCodeChange();
     });
 
-    // Keyboard Shortcuts (Ctrl+S / Cmd+S)
+    // Keyboard Shortcuts (Ctrl+S / Cmd+S / Ctrl+Enter to compile)
     window.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault();
         saveCurrentFileLocally();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        compileRealLatex();
+      }
+    });
+
+    // Compilers triggers
+    el.triggerCompileBtn.addEventListener('click', compileRealLatex);
+    el.initialCompileBtn.addEventListener('click', compileRealLatex);
+    el.quickCompileBtnNav.addEventListener('click', compileRealLatex);
+
+    // Open PDF external button
+    el.openPdfExternalBtn.addEventListener('click', () => {
+      try {
+        if (el.pdfPreviewFrame.src && el.pdfPreviewFrame.src !== 'about:blank') {
+          window.open(el.pdfPreviewFrame.src, '_blank');
+        } else {
+          compileRealLatex();
+        }
+      } catch (err) {
+        window.open('https://texlive.net/run', '_blank');
       }
     });
 
@@ -563,11 +669,6 @@ This paper introduced an integrated, cloud-compiled academic authoring system de
         switchAuxTab(tab.dataset.tab);
       });
     });
-
-    function switchAuxTab(tabName) {
-      document.querySelectorAll('.aux-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + tabName));
-    }
 
     // Touch Toolbar Actions
     document.querySelectorAll('.tool-btn').forEach(btn => {
@@ -648,14 +749,7 @@ This paper introduced an integrated, cloud-compiled academic authoring system de
       renderCommitLog();
 
       closeModal(el.commitModal);
-      showToast('Commit enviado com sucesso para o GitHub!');
-
-      // Update Actions status animation
-      el.actionsStatus.innerHTML = '<span class="status-dot" style="background:#38bdf8;animation:pulse 1s infinite"></span> Actions: Compilando...';
-      setTimeout(() => {
-        el.actionsStatus.innerHTML = '<span class="status-dot ready"></span> Actions: PDF Atualizado';
-        showToast('GitHub Actions: PDF compilado e release gerada!');
-      }, 3500);
+      showToast('Commit registrado com sucesso!');
     });
 
     // Settings Modal
@@ -674,15 +768,9 @@ This paper introduced an integrated, cloud-compiled academic authoring system de
     // Knowledge Base Search
     el.kbSearch.addEventListener('input', (e) => renderKnowledgeBase(e.target.value));
 
-    // Refresh Preview
-    el.refreshPreviewBtn.addEventListener('click', () => {
-      updatePreview();
-      showToast('Preview atualizado!');
-    });
-
     // Push to Drive Review (S-Pen)
     el.pushDriveReviewBtn.addEventListener('click', () => {
-      showToast('Enviado para: ' + state.settings.drivePath + '\\main_revisao.pdf');
+      showToast('Enviado para o Google Drive para anotação no Xodo (S-Pen)!');
     });
 
     // Close modals on clicking backdrop

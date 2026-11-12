@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>LaTeX Acadêmico Studio | Tablet & Mobile</title>
   
-  <meta name="description" content="Sistema de escrita acadêmica colaborativa em LaTeX para Tablet, Celular e PC integrado ao GitHub e Obsidian.">
+  <meta name="description" content="Sistema de escrita acadêmica colaborativa em LaTeX para Tablet, Celular e PC com compilação real em nuvem TeX Live e integração com Obsidian.">
   <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -28,24 +28,24 @@
       </button>
       <div class="brand">
         <span class="brand-badge">LaTeX Studio</span>
-        <span id="active-repo-name" class="repo-badge">demo / paper-cros2027</span>
+        <span id="active-repo-name" class="repo-badge">AndreCasadeiMarques/paper-cros2027</span>
       </div>
     </div>
 
     <!-- Center Mode Switcher (Mobile/Tablet) -->
     <div class="view-switcher" id="view-switcher">
       <button class="view-btn active" data-view="editor">Editor</button>
-      <button class="view-btn" data-view="preview">PDF Preview</button>
+      <button class="view-btn" data-view="preview">PDF Preview (Real)</button>
       <button class="view-btn" data-view="fichamentos">Fichamentos</button>
     </div>
 
     <!-- Top Action Buttons -->
     <div class="nav-right">
-      <div class="actions-status" id="actions-status" title="Status da Compilação no GitHub Actions">
-        <span class="status-dot ready"></span>
-        <span class="status-text">Actions: Pronto</span>
-      </div>
-      <button id="quick-save-btn" class="btn btn-secondary" title="Salvar Localmente (Ctrl+S)">
+      <button id="quick-compile-btn-nav" class="btn btn-compile" title="Compilar LaTeX Real no TeX Live">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span>Compilar PDF</span>
+      </button>
+      <button id="quick-save-btn" class="btn btn-secondary" title="Salvar Rascunho Local">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
         <span>Salvar</span>
       </button>
@@ -74,9 +74,9 @@
       <div class="sidebar-templates">
         <span class="sub-heading">Templates Prontos</span>
         <div class="template-chips">
-          <span class="chip active">IEEEtran Conf</span>
-          <span class="chip">SBC / Eventos</span>
-          <span class="chip">Elsevier</span>
+          <span class="chip active" data-template="ieee">IEEEtran Conf</span>
+          <span class="chip" data-template="sbc">SBC / Eventos</span>
+          <span class="chip" data-template="article">Artigo Padrão</span>
         </div>
       </div>
     </aside>
@@ -87,7 +87,7 @@
       <div class="editor-header">
         <div class="file-info">
           <span class="file-icon">📄</span>
-          <span id="current-filename" class="file-name">sections/01_introduction.tex</span>
+          <span id="current-filename" class="file-name">main.tex</span>
           <span id="unsaved-tag" class="unsaved-tag hidden">não salvo</span>
         </div>
         <div class="editor-stats">
@@ -125,10 +125,12 @@
       </div>
     </section>
 
-    <!-- Right Pane: Multi-Tab Viewer (Preview, Fichamentos, Colaboradores) -->
+    <!-- Right Pane: Multi-Tab Viewer (Real PDF Preview, Fichamentos, Colaboradores) -->
     <aside class="aux-pane" id="aux-pane">
       <div class="aux-tabs">
-        <button class="aux-tab active" data-tab="preview">PDF Preview</button>
+        <button class="aux-tab active" data-tab="preview">
+          <span>PDF Oficial (TeX Live)</span>
+        </button>
         <button class="aux-tab" data-tab="fichamentos">
           <span>Fichamentos</span>
           <span class="counter-badge" id="kb-count">3</span>
@@ -136,29 +138,37 @@
         <button class="aux-tab" data-tab="git">Colaboradores</button>
       </div>
 
-      <!-- Tab Content 1: PDF & Compilation -->
+      <!-- Tab Content 1: REAL TeX Live PDF & Compilation -->
       <div class="tab-content active" id="tab-preview">
         <div class="preview-actions">
-          <button id="refresh-preview-btn" class="btn btn-sm btn-secondary">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-            Preview Rápido
+          <button id="trigger-compile-btn" class="btn btn-sm btn-compile">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Recompilar PDF Real
           </button>
-          <a id="download-pdf-btn" href="#" class="btn btn-sm btn-primary" target="_blank" download="main.pdf">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Baixar PDF Oficial
-          </a>
+          <button id="open-pdf-external-btn" class="btn btn-sm btn-secondary" title="Abrir PDF em nova aba">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Abrir em Nova Aba
+          </button>
           <button id="push-drive-review-btn" class="btn btn-sm btn-outline" title="Enviar PDF ao Drive para riscar no Xodo com S-Pen">
             ✏️ Revisão S-Pen
           </button>
         </div>
 
+        <div class="compile-status-bar" id="compile-status-bar">
+          <span class="spinner hidden" id="compile-spinner"></span>
+          <span id="compile-status-msg">Clique em 'Compilar PDF' para gerar o documento via TeX Live.</span>
+        </div>
+
         <div class="preview-viewport" id="preview-viewport">
-          <div class="preview-card" id="preview-render-area">
-            <!-- Simulated / Rendered Preview -->
-            <div class="rendered-paper">
-              <h2 id="prev-title">Carregando visualização...</h2>
-              <div id="prev-body" class="paper-text"></div>
-            </div>
+          <!-- Real PDF IFrame from TeXLive.net / PDF.js -->
+          <iframe id="pdf-preview-frame" name="pdf-preview-frame" class="pdf-iframe" src="about:blank"></iframe>
+          <div id="pdf-placeholder" class="pdf-placeholder">
+            <div class="placeholder-icon">📑</div>
+            <h3>Motor de Compilação TeX Live</h3>
+            <p>Compilação real com suporte completo a classes IEEEtran, fórmulas matemáticas, tabelas e BibTeX.</p>
+            <button id="initial-compile-btn" class="btn btn-primary btn-compile-lg">
+              ▶️ Compilar Documento Agora
+            </button>
           </div>
         </div>
       </div>
@@ -188,7 +198,7 @@
             <li>
               <div class="author-avatar">LAB</div>
               <div class="author-details">
-                <strong>Colega do LAB</strong>
+                <strong>Pesquisador do LAB</strong>
                 <span class="role">Coautor (Edição Modular)</span>
               </div>
             </li>
@@ -204,6 +214,9 @@
       </div>
     </aside>
   </main>
+
+  <!-- Hidden Form for TeXLive.net Submissions -->
+  <form id="latexcgi-form" method="POST" action="https://texlive.net/cgi-bin/latexcgi" enctype="multipart/form-data" target="pdf-preview-frame" style="display:none;"></form>
 
   <!-- Modal: Citation Picker (\cite{}) -->
   <div class="modal-overlay hidden" id="cite-modal">
@@ -233,8 +246,8 @@
         <textarea id="commit-msg" rows="3" placeholder="Ex: Adiciona formulação da seção de metodologia"></textarea>
         
         <div class="commit-summary">
-          <span class="summary-label">Arquivo:</span>
-          <span id="commit-target-file">sections/01_introduction.tex</span>
+          <span class="summary-label">Arquivo ativo:</span>
+          <span id="commit-target-file">main.tex</span>
         </div>
       </div>
       <div class="modal-footer">
@@ -254,7 +267,7 @@
       <div class="modal-body">
         <div class="form-group">
           <label for="cfg-repo">Repositório GitHub (owner/repo):</label>
-          <input type="text" id="cfg-repo" value="AndreCasadeiMarques/paper-cros2027">
+          <input type="text" id="cfg-repo" value="AndreCasadeiMarques/latex-academic-system">
         </div>
         <div class="form-group">
           <label for="cfg-token">GitHub Personal Access Token (PAT):</label>
